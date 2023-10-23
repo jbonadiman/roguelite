@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "go",
+      "label": "build",
+      "command": "build",
+      "args": [
+        "${workspaceFolder}\\cmd\\main.go"
+      ],
+      "problemMatcher": [
+        "$go"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "cd c:\\Users\\joao\\sources\\roguelite; go build ${workspaceFolder}\\cmd\\main.go",
+    }
+  ]
+}
