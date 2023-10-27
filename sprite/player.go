@@ -1,4 +1,4 @@
-package sprites
+package sprite
 
 import "github.com/hajimehoshi/ebiten/v2"
 
@@ -7,7 +7,7 @@ type Player struct {
 }
 
 func NewPlayer(x, y int) *Player {
-	return &Player{sprite: NewSpriteFromSheet(27, 1, x, y)}
+	return &Player{sprite: NewSpriteFromSheet(0, 25, x, y)}
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
@@ -15,4 +15,8 @@ func (p *Player) Draw(screen *ebiten.Image) {
 }
 
 func (p *Player) Update() {
+}
+
+func (p *Player) Size() (int, int) {
+	return SpritesSize, SpritesSize
 }

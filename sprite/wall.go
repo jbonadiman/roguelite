@@ -1,4 +1,4 @@
-package sprites
+package sprite
 
 import "github.com/hajimehoshi/ebiten/v2"
 
@@ -15,4 +15,8 @@ func (w *Wall) Draw(screen *ebiten.Image) {
 }
 
 func (w *Wall) Update() {
+}
+
+func (w *Wall) Size() (int, int) {
+	return SpritesSize, SpritesSize
 }

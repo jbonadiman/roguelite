@@ -2,84 +2,38 @@ package main
 
 import (
 	"fmt"
+	"image/color"
+	_ "image/png"
 	"log"
-
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/jbonadiman/roguelite"
 	"github.com/jbonadiman/roguelite/resources/fonts"
-	"github.com/jbonadiman/roguelite/sprites"
-
-	_ "image/png"
-)
-
-const (
-	MAP_WIDTH  = 10
-	MAP_HEIGHT = 8
+	"github.com/jbonadiman/roguelite/text"
 )
 
 var (
-	snapJackFont font.Face
-	textImage    = ebiten.NewImage(400, 300)
-	player       *sprites.Player
-	gameMap      = []int{
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	firstLevel = [][]int{
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 2, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 	}
-	gameObjects []roguelite.GameObject
+	helloWorldText *ebiten.Image
 )
 
 type Game struct {
-	keys []ebiten.Key
+	keys     []ebiten.Key
+	level    *roguelite.Level
+	gameFont text.Font
 }
 
-func loadFontFromFile(fontData []byte, options opentype.FaceOptions) (font.Face, error) {
-	tt, err := opentype.Parse(fontData)
-	if err != nil {
-		return nil, err
-	}
-
-	loadedFont, err := opentype.NewFace(tt, &options)
-	if err != nil {
-		return nil, err
-	}
-
-	return loadedFont, nil
-}
-
-func init() {
-	var err error
-
-	snapJackFont, err = loadFontFromFile(fonts.Snapjack_otf, opentype.FaceOptions{
-		Size:    16,
-		DPI:     72,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for i := 0; i < MAP_HEIGHT; i++ {
-		for j := 0; j < MAP_WIDTH; j++ {
-			if gameMap[i*MAP_WIDTH+j] == 1 {
-				gameObjects = append(
-					gameObjects,
-					sprites.NewWall(i*sprites.SPRITES_SIZE, j*sprites.SPRITES_SIZE))
-			}
-		}
-	}
-
-	player = sprites.NewPlayer(20, 20)
-}
+func init() {}
 
 func (g *Game) Update() error {
 	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
@@ -102,25 +56,39 @@ func (g *Game) Update() error {
 	// 	}
 	// }
 
+	g.level.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// text.Draw(textImage, "Hello Ebiten!", snapJackFont, 20, 40, color.White)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(0, 150)
 
-	for _, obj := range gameObjects {
-		obj.Draw(screen)
-	}
+	screen.DrawImage(helloWorldText, op)
+	g.level.Draw(screen)
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+func (g *Game) Layout(int, int) (screenWidth int, screenHeight int) {
 	return 320, 240
 }
 
 func main() {
 	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Hello, World!")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	ebiten.SetWindowTitle("roguelite")
+
+	snapJackFont, err := text.NewFont(12, fonts.Snapjack_otf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	helloWorldText = snapJackFont.Printf(color.White, "Hello World!")
+
+	game := &Game{
+		level:    roguelite.NewLevelFromMatrix(firstLevel),
+		gameFont: snapJackFont,
+	}
+
+	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }

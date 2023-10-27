@@ -1,4 +1,4 @@
-package sprites
+package sprite
 
 import (
 	"bytes"
@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	spritesheet *ebiten.Image
+	spriteSheet *ebiten.Image
 )
 
 const (
-	SPRITES_SIZE = 16
+	SpritesSize = 16
 )
 
 type Sprite struct {
@@ -27,21 +27,23 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	spritesheet = ebiten.NewImageFromImage(img)
+	spriteSheet = ebiten.NewImageFromImage(img)
 }
 
 func NewSpriteFromSheet(row, column, x, y int) *Sprite {
-	image := spritesheet.SubImage(
+	img := spriteSheet.SubImage(
 		image.Rect(
-			(column * SPRITES_SIZE),
-			(row * SPRITES_SIZE),
-			((column + 1) * SPRITES_SIZE),
-			((row + 1) * SPRITES_SIZE))).(*ebiten.Image)
+			column*SpritesSize,
+			row*SpritesSize,
+			(column+1)*SpritesSize,
+			(row+1)*SpritesSize,
+		),
+	).(*ebiten.Image)
 
 	return &Sprite{
 		X:     x,
 		Y:     y,
-		Image: image,
+		Image: img,
 	}
 }
 
